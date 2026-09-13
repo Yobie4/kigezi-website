@@ -74,7 +74,7 @@
 
   <div class="box">
     <strong>Contact us</strong>
-    <p style="margin:8px 0 0;">Email: <a href="mailto:info@kigeziassociation.org">info@kigeziassociation.org</a><br>Phone: <a href="https://wa.me/256776455028" target="_blank" rel="noopener" class="wa-link">+256 776 455 028</a><br>Kira Municipal Council, Kyaliwajala Ward, Namugongo Parish, Wakiso District, Uganda</p>
+    <p style="margin:8px 0 0;">Email: <a href="mailto:info@kigeziassociation.org">info@kigeziassociation.org</a><br>Phone: <a href="https://wa.me/256776455028" target="_blank" rel="noopener">+256 776 455 028</a><br>Kira Municipal Council, Kyaliwajala Ward, Namugongo Parish, Wakiso District, Uganda</p>
   </div>
 </main>
 
@@ -84,19 +84,5 @@
   </div>
 </footer>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-<script>
-  // Prefer WhatsApp Business on Android for the Secretariat's registered
-  // number — see index.html for the full explanation of why this can't be
-  // a plain href and why iOS/desktop are unaffected.
-  if (/Android/i.test(navigator.userAgent)) {
-    document.querySelectorAll('a.wa-link').forEach(function (a) {
-      var digits = a.href.split('wa.me/')[1];
-      if (!digits) return;
-      var fallback = encodeURIComponent('https://wa.me/' + digits);
-      a.href = 'intent://send/?phone=' + digits +
-        '#Intent;scheme=https;package=com.whatsapp.w4b;S.browser_fallback_url=' + fallback + ';end';
-    });
-  }
-</script>
 </body>
 </html>
