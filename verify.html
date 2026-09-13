@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Login — Kigezi Association</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{
+    --navy:#14335e;
+    --blue:#1f5fa8;
+    --blue-light:#eaf1fb;
+    --gold:#c9a227;
+    --maroon:#6e1423;
+    --ink:#1b2430;
+    --muted:#5b6675;
+    --bg:#ffffff;
+    --line:#e4e8ee;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color:var(--ink);
+    background:linear-gradient(135deg,var(--navy),var(--blue));
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    line-height:1.6;
+  }
+  .card{
+    background:#fff;
+    border-radius:14px;
+    max-width:440px;
+    width:100%;
+    padding:36px 32px;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+  }
+  .card img{height:64px;width:64px;border-radius:50%;display:block;margin:0 auto 14px;object-fit:cover;}
+  h1{font-size:1.3rem;margin:0 0 4px;text-align:center;color:var(--navy);}
+  p.sub{text-align:center;color:var(--muted);font-size:.92rem;margin:0 0 26px;}
+  label{display:block;font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
+  .field{margin-bottom:18px;}
+  input{
+    width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;
+    font-size:1rem;font-family:inherit;
+  }
+  input:focus{outline:2px solid var(--blue);outline-offset:1px;}
+  button{
+    width:100%;padding:12px;border:none;border-radius:8px;
+    background:var(--navy);color:#fff;font-weight:700;font-size:1rem;
+    cursor:pointer;margin-top:6px;
+  }
+  button:disabled{opacity:.6;cursor:default;}
+  button:hover:not(:disabled){background:var(--blue);}
+  .msg{
+    margin-top:16px;padding:12px 14px;border-radius:8px;font-size:.9rem;display:none;
+  }
+  .msg.error{display:block;background:#fdeceb;color:var(--maroon);border:1px solid #f3c8c3;}
+  .msg.info{display:block;background:var(--blue-light);color:var(--navy);border:1px solid #cfe0f5;}
+  .back{display:block;text-align:center;margin-top:20px;font-size:.85rem;color:var(--muted);text-decoration:none;}
+  .back:hover{color:var(--blue);}
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <img src="assets/logo.jpg" alt="Kigezi Association logo">
+    <h1>Member Verification</h1>
+    <p class="sub">Enter your full name and member number to continue to the KAMS login page.</p>
+
+    <form id="verifyForm">
+      <div class="field">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="member_number">Member Number</label>
+        <input type="text" id="member_number" inputmode="numeric" autocomplete="off" required>
+      </div>
+      <button type="submit" id="submitBtn">Continue</button>
+    </form>
+
+    <div id="msg" class="msg"></div>
+
+    <a class="back" href="index.html">&larr; Back to home</a>
+  </div>
+
+<script>
+  // Points at the Express API directly — NOT the React app (kigezi-frontend),
+  // which has no verification endpoint of its own.
+  const API_BASE = 'https://kigezi-backend.onrender.com';
+  const LOGIN_URL = 'https://kigezi-frontend.onrender.com';
+
+  // This screens who gets handed the login page link from THIS website —
+  // it is not the account login itself (that's still username + password
+  // on the real KAMS login form) and it can't stop someone who already
+  // knows or guesses the login URL directly. It exists to keep casual
+  // visitors and search engines from landing straight on the login form.
+  const form = document.getElementById('verifyForm');
+  const msg = document.getElementById('msg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showMessage(text, type) {
+    msg.textContent = text;
+    msg.className = 'msg ' + type;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    showMessage('', '');
+    msg.className = 'msg';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Checking…';
+
+    const full_name = document.getElementById('full_name').value.trim();
+    const member_number = document.getElementById('member_number').value.trim();
+
+    try {
+      const res = await fetch(API_BASE + '/api/public/verify-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_name, member_number }),
+      });
+      const data = await res.json();
+
+      if (res.status === 429) {
+        showMessage(data.error || 'Too many attempts. Please try again later.', 'error');
+      } else if (data.verified) {
+        showMessage('Verified — redirecting to login…', 'info');
+        window.location.href = LOGIN_URL;
+        return;
+      } else {
+        showMessage('We could not verify those details. Please check your full name and member number, or contact the Secretariat on WhatsApp.', 'error');
+      }
+    } catch (err) {
+      showMessage('Could not reach the verification service. Please check your connection and try again.', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Continue';
+    }
+  });
+</script>
+
+</body>
+</html>
