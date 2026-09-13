@@ -55,7 +55,7 @@
   <h2>How to Request Deletion</h2>
   <p>If you would like your personal information removed from the Kigezi Association Management System (KAMS) and our WhatsApp self-service records, please follow these steps:</p>
   <ol>
-    <li>Send an email to <a href="mailto:info@kigeziassociation.org">info@kigeziassociation.org</a>, or contact the Secretariat directly at <a href="https://wa.me/256776455028" target="_blank" rel="noopener">+256 776 455 028</a>, with your full name and member number (if applicable).</li>
+    <li>Send an email to <a href="mailto:info@kigeziassociation.org">info@kigeziassociation.org</a>, or contact the Secretariat directly at <a href="https://wa.me/256776455028" target="_blank" rel="noopener" class="wa-link">+256 776 455 028</a>, with your full name and member number (if applicable).</li>
     <li>State clearly that you are requesting deletion of your personal data.</li>
     <li>We will verify your identity as a member (or former member) before processing the request.</li>
     <li>We will confirm once your request has been actioned, typically within 14 days.</li>
@@ -69,7 +69,7 @@
 
   <div class="box">
     <strong>Contact us</strong>
-    <p style="margin:8px 0 0;">Email: <a href="mailto:info@kigeziassociation.org">info@kigeziassociation.org</a><br>Phone: <a href="https://wa.me/256776455028" target="_blank" rel="noopener">+256 776 455 028</a><br>Kira Municipal Council, Kyaliwajala Ward, Namugongo Parish, Wakiso District, Uganda</p>
+    <p style="margin:8px 0 0;">Email: <a href="mailto:info@kigeziassociation.org">info@kigeziassociation.org</a><br>Phone: <a href="https://wa.me/256776455028" target="_blank" rel="noopener" class="wa-link">+256 776 455 028</a><br>Kira Municipal Council, Kyaliwajala Ward, Namugongo Parish, Wakiso District, Uganda</p>
   </div>
 </main>
 
@@ -79,5 +79,19 @@
   </div>
 </footer>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script>
+  // Prefer WhatsApp Business on Android for the Secretariat's registered
+  // number — see index.html for the full explanation of why this can't be
+  // a plain href and why iOS/desktop are unaffected.
+  if (/Android/i.test(navigator.userAgent)) {
+    document.querySelectorAll('a.wa-link').forEach(function (a) {
+      var digits = a.href.split('wa.me/')[1];
+      if (!digits) return;
+      var fallback = encodeURIComponent('https://wa.me/' + digits);
+      a.href = 'intent://send/?phone=' + digits +
+        '#Intent;scheme=https;package=com.whatsapp.w4b;S.browser_fallback_url=' + fallback + ';end';
+    });
+  }
+</script>
 </body>
 </html>

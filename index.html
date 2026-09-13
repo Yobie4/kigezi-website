@@ -231,7 +231,7 @@
       <div>
         <div class="contact-item">
           <div class="label">Phone</div>
-          <div class="value"><a href="https://wa.me/256776455028" target="_blank" rel="noopener">+256 776 455 028</a></div>
+          <div class="value"><a href="https://wa.me/256776455028" target="_blank" rel="noopener" class="wa-link">+256 776 455 028</a></div>
         </div>
         <div class="contact-item">
           <div class="label">Email</div>
@@ -259,5 +259,24 @@
 </footer>
 
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script>
+  // Prefer WhatsApp Business on Android for the Secretariat's registered
+  // number. A plain wa.me link can't choose between WhatsApp and WhatsApp
+  // Business when a visitor has both installed — the OS decides that, not
+  // the page — so on Android we rewrite the link to an explicit intent
+  // naming the Business app's package, falling back to the ordinary wa.me
+  // link (whichever WhatsApp app is available/default) if Business isn't
+  // installed. iOS and desktop have no equivalent app-targeting mechanism,
+  // so they keep the plain wa.me link untouched.
+  if (/Android/i.test(navigator.userAgent)) {
+    document.querySelectorAll('a.wa-link').forEach(function (a) {
+      var digits = a.href.split('wa.me/')[1];
+      if (!digits) return;
+      var fallback = encodeURIComponent('https://wa.me/' + digits);
+      a.href = 'intent://send/?phone=' + digits +
+        '#Intent;scheme=https;package=com.whatsapp.w4b;S.browser_fallback_url=' + fallback + ';end';
+    });
+  }
+</script>
 </body>
 </html>
